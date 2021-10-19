@@ -1,0 +1,37 @@
+node{
+    def mavenHome = tool name: "maven3.82"
+    
+  stage('CheckOutCode')
+{
+git branch: 'development', credentialsId: '3a22338b-80e4-4b08-b854-565eb8e8f352', url: 'https://github.com/reddyyyyyyy/maven-web-application.git'
+}
+ 
+stage('Build')
+{
+   sh "${mavenHome}/bin/mvn clean package" 
+}
+
+stage('SonarQubeReport'){
+   
+   sh "${mavenHome}/bin/mvn clean sonar:sonar" 
+}
+
+stage('UploadArtifactIntoNexus'){
+  sh "${mavenHome}/bin/mvn clean deploy"  
+}
+
+stage('DeployAppIntoTomcatServer')
+{
+sshagent(['5c08533f-3e39-4522-b40d-b39f0db61a1b']) {
+sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@65.0.179.173:/opt/apache-tomcat-9.0.54/webapps/"
+}
+}
+stage('SendEmailNotification'){
+    emailext body: '''Build is over 
+
+
+Regards
+Reddy technologies
+banglr''', subject: 'Build Over...!!', to: 'narasimhar049@gmail.com'
+}
+}
