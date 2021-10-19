@@ -21,7 +21,7 @@ stage('SonarQubeReport'){
    
    sh "${mavenHome}/bin/mvn clean sonar:sonar" 
 }
-
+/*
 stage('UploadArtifactIntoNexus'){
   sh "${mavenHome}/bin/mvn clean deploy"  
 }
@@ -32,6 +32,8 @@ sshagent(['5c08533f-3e39-4522-b40d-b39f0db61a1b']) {
 sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@65.0.179.173:/opt/apache-tomcat-9.0.54/webapps/"
 }
 }
+
+*/
 stage('SendEmailNotification'){
     emailext body: '''Build is over 
 
